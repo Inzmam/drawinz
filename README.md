@@ -1,7 +1,5 @@
 # Drawinz - Simple JavaScript Drawing Tool
 
-![Drawinz Logo](https://cdn.jsdelivr.net/gh/Inzmam/drawinz@v1.0.0/logo.png) *(Optional: Add your project logo here)*
-
 **Drawinz** is a lightweight JavaScript library that allows you to integrate a simple drawing tool into any webpage with ease. It supports basic drawing functionalities like brush, eraser, and line tool.
 
 ## 🚀 Features
