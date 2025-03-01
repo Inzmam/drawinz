@@ -4,12 +4,6 @@
   function DrawingApp(config) {
     const { canvasId } = config;
 
-    // Add Font Awesome dynamically
-    const fontAwesome = document.createElement('link');
-    fontAwesome.rel = 'stylesheet';
-    fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
-    document.head.appendChild(fontAwesome);
-
     // Add CSS styles dynamically
     const styleSheet = document.createElement('style');
     styleSheet.textContent = `
@@ -263,15 +257,15 @@
 
     // Create all buttons in a single group
     const tools = [
-      { name: 'Brush', icon: '✏️', shortcut: 'b', id: 'brush', title: 'Brush (Ctrl+B)' },
-      { name: 'Eraser', icon: '🧹', shortcut: 'e', id: 'eraser', title: 'Eraser (Ctrl+E)' },
-      { name: 'Line', icon: '╱', shortcut: 'l', id: 'line', title: 'Line (Ctrl+L)' },
-      { name: 'Rectangle', icon: '□', shortcut: 'r', id: 'rectangle', title: 'Rectangle (Ctrl+R)' },
-      { name: 'Circle', icon: '○', shortcut: 'c', id: 'circle', title: 'Circle (Ctrl+C)' },
-      { name: 'Undo', icon: '↩', onClick: undo, shortcut: 'z', id: 'undo', title: 'Undo (Ctrl+Z)' },
-      { name: 'Redo', icon: '↪', onClick: redo, shortcut: 'y', id: 'redo', title: 'Redo (Ctrl+Y)' },
-      { name: 'Clear', icon: '🗑', onClick: clearCanvas, shortcut: 'x', id: 'clear', title: 'Clear (Ctrl+X)' },
-      { name: 'Save', icon: '💾', onClick: downloadCanvas, shortcut: 's', id: 'save', title: 'Save (Ctrl+S)' }
+      { name: 'Brush', icon: '✏️', shortcut: 'b', id: 'brush', title: 'Brush (Ctrl+Shift+B)' },
+      { name: 'Eraser', icon: '🧹', shortcut: 'e', id: 'eraser', title: 'Eraser (Ctrl+Shift+E)' },
+      { name: 'Line', icon: '╱', shortcut: 'l', id: 'line', title: 'Line (Ctrl+Shift+L)' },
+      { name: 'Rectangle', icon: '□', shortcut: 'r', id: 'rectangle', title: 'Rectangle (Ctrl+Shift+R)' },
+      { name: 'Circle', icon: '○', shortcut: 'c', id: 'circle', title: 'Circle (Ctrl+Shift+C)' },
+      { name: 'Undo', icon: '↩', onClick: undo, shortcut: 'z', id: 'undo', title: 'Undo (Ctrl+Shift+Z)' },
+      { name: 'Redo', icon: '↪', onClick: redo, shortcut: 'y', id: 'redo', title: 'Redo (Ctrl+Shift+Y)' },
+      { name: 'Clear', icon: '🗑', onClick: clearCanvas, shortcut: 'x', id: 'clear', title: 'Clear (Ctrl+Shift+X)' },
+      { name: 'Save', icon: '💾', onClick: downloadCanvas, shortcut: 's', id: 'save', title: 'Save (Ctrl+Shift+S)' }
     ];
 
     tools.forEach(tool => {
