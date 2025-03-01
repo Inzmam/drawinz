@@ -291,17 +291,14 @@
 
     // Create tool buttons
     const tools = [
-      { name: 'Brush', icon: '✏️' },
-      { name: 'Eraser', icon: '🧹' },
-      { name: 'Line', icon: '╱' },
-      { name: 'Rectangle', icon: '□' },
-      { name: 'Circle', icon: '○' }
+      { name: 'brush', icon: '✏️', id: 'brush', title: 'Brush' },
+      { name: 'eraser', icon: '🧹', id: 'eraser', title: 'Eraser' },
+      { name: 'line', icon: '╱', id: 'line', title: 'Line' },
+      { name: 'rectangle', icon: '□', id: 'rectangle', title: 'Rectangle' },
+      { name: 'circle', icon: '○', id: 'circle', title: 'Circle' }
     ];
     tools.forEach(tool => {
-      const button = document.createElement('button');
-      button.textContent = tool.icon;
-      button.setAttribute('title', tool.name);
-      button.classList.add('tool-btn');
+      const button = createToolButton(tool);
       toolsGroup.appendChild(button);
     });
 
@@ -353,7 +350,7 @@
         button.classList.add('active');
         
         // Set current tool based on title attribute
-        currentTool = button.getAttribute('title');
+        currentTool = button.id;
       });
     });
 
@@ -379,7 +376,7 @@
       const currentY = e.offsetY;
 
       // Restore the last saved state before drawing new preview
-      if (['Line', 'Rectangle', 'Circle'].includes(currentTool)) {
+      if (['line', 'rectangle', 'circle'].includes(currentTool)) {
         ctx.putImageData(lastDrawing, 0, 0);
       }
 
@@ -389,14 +386,14 @@
       ctx.strokeStyle = colorPicker.value;
       
       switch(currentTool) {
-        case 'Brush':
+        case 'brush':
           ctx.lineTo(currentX, currentY);
           ctx.stroke();
           ctx.beginPath();
           ctx.moveTo(currentX, currentY);
           break;
 
-        case 'Eraser':
+        case 'eraser':
           // Save current context state
           ctx.save();
           
@@ -418,14 +415,14 @@
           ctx.restore();
           break;
 
-        case 'Line':
+        case 'line':
           ctx.beginPath();
           ctx.moveTo(startX, startY);
           ctx.lineTo(currentX, currentY);
           ctx.stroke();
           break;
 
-        case 'Rectangle':
+        case 'rectangle':
           ctx.beginPath();
           ctx.rect(
             startX, 
@@ -436,7 +433,7 @@
           ctx.stroke();
           break;
 
-        case 'Circle':
+        case 'circle':
           ctx.beginPath();
           const radius = Math.sqrt(
             Math.pow(currentX - startX, 2) + 
@@ -502,6 +499,15 @@
       link.download = 'my-drawing.png';
       link.href = canvas.toDataURL();
       link.click();
+    }
+
+    function createToolButton(tool) {
+      const button = document.createElement('button');
+      button.textContent = tool.icon;
+      button.setAttribute('title', tool.title);
+      button.classList.add('tool-btn');
+      button.id = tool.id;
+      return button;
     }
   }
 
