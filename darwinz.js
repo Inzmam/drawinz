@@ -26,25 +26,12 @@
         box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
         display: flex;
         flex-direction: column;
-        gap: 25px;
+        gap: 15px;
         height: 100vh;
         width: 120px;
         position: fixed;
         left: 0;
         top: 0;
-      }
-
-      .drawing-app-container .tool-group {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 12px;
-        padding: 15px 0;
-        border-bottom: 2px solid #f0f0f0;
-      }
-
-      .drawing-app-container .tool-group:last-child {
-        border-bottom: none;
       }
 
       .drawing-app-container .tool-btn {
@@ -181,23 +168,8 @@
           flex-direction: row;
           padding: 15px;
           justify-content: center;
-        }
-
-        .drawing-app-container .tool-group {
-          flex-direction: row;
-          padding: 0 15px;
-          border-bottom: none;
-          border-right: 2px solid #f0f0f0;
-        }
-
-        .drawing-app-container .tool-group:last-child {
-          border-right: none;
-        }
-
-        .drawing-app-container #brushSize {
-          transform: none;
-          width: 100px;
-          margin: 0;
+          flex-wrap: wrap;
+          gap: 10px;
         }
 
         .drawing-app-container canvas {
@@ -289,33 +261,25 @@
     brushSize.value = '5';
     brushGroup.appendChild(brushSize);
 
-    // Create tool buttons
+    // Create all buttons in a single group
     const tools = [
-      { name: 'brush', icon: '✏️', id: 'brush', title: 'Brush' },
-      { name: 'eraser', icon: '🧹', id: 'eraser', title: 'Eraser' },
-      { name: 'line', icon: '╱', id: 'line', title: 'Line' },
-      { name: 'rectangle', icon: '□', id: 'rectangle', title: 'Rectangle' },
-      { name: 'circle', icon: '○', id: 'circle', title: 'Circle' }
+      { name: 'Brush', icon: '✏️', shortcut: 'b', id: 'brush', title: 'Brush (Ctrl+B)' },
+      { name: 'Eraser', icon: '🧹', shortcut: 'e', id: 'eraser', title: 'Eraser (Ctrl+E)' },
+      { name: 'Line', icon: '╱', shortcut: 'l', id: 'line', title: 'Line (Ctrl+L)' },
+      { name: 'Rectangle', icon: '□', shortcut: 'r', id: 'rectangle', title: 'Rectangle (Ctrl+R)' },
+      { name: 'Circle', icon: '○', shortcut: 'c', id: 'circle', title: 'Circle (Ctrl+C)' },
+      { name: 'Undo', icon: '↩', onClick: undo, shortcut: 'z', id: 'undo', title: 'Undo (Ctrl+Z)' },
+      { name: 'Redo', icon: '↪', onClick: redo, shortcut: 'y', id: 'redo', title: 'Redo (Ctrl+Y)' },
+      { name: 'Clear', icon: '🗑', onClick: clearCanvas, shortcut: 'x', id: 'clear', title: 'Clear (Ctrl+X)' },
+      { name: 'Save', icon: '💾', onClick: downloadCanvas, shortcut: 's', id: 'save', title: 'Save (Ctrl+S)' }
     ];
+
     tools.forEach(tool => {
       const button = createToolButton(tool);
-      toolsGroup.appendChild(button);
-    });
-
-    // Create action buttons (Undo, Redo, Clear Canvas, Download)
-    const actions = [
-      { title: 'Undo', icon: '↩', onClick: undo },
-      { title: 'Redo', icon: '↪', onClick: redo },
-      { title: 'Clear', icon: '🗑', onClick: clearCanvas },
-      { title: 'Save', icon: '💾', onClick: downloadCanvas }
-    ];
-    actions.forEach(action => {
-      const button = document.createElement('button');
-      button.textContent = action.icon;
-      button.setAttribute('title', action.title);
-      button.classList.add('tool-btn');
-      button.addEventListener('click', action.onClick);
-      actionsGroup.appendChild(button);
+      if (tool.onClick) {
+        button.addEventListener('click', tool.onClick);
+      }
+      toolbar.appendChild(button);
     });
 
     // Drawing state
@@ -507,8 +471,30 @@
       button.setAttribute('title', tool.title);
       button.classList.add('tool-btn');
       button.id = tool.id;
+      button.dataset.shortcut = tool.shortcut;
       return button;
     }
+
+    // Add keyboard shortcut handler
+    document.addEventListener('keydown', (e) => {
+      // Check if Ctrl (Windows) or Cmd (Mac) is pressed
+      if (!(e.ctrlKey || e.metaKey)) return;
+      
+      // Ignore shortcuts when typing in input elements
+      if (e.target.tagName === 'INPUT') return;
+
+      const key = e.key.toLowerCase();
+
+      // Find the tool button with matching shortcut
+      const toolButton = Array.from(document.querySelectorAll('.tool-btn')).find(
+        btn => btn.dataset.shortcut === key
+      );
+
+      if (toolButton) {
+        e.preventDefault(); // Prevent default browser shortcuts
+        toolButton.click();
+      }
+    });
   }
 
   global.DrawingApp = DrawingApp;
