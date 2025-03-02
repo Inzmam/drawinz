@@ -471,9 +471,17 @@
 
     // Add keyboard shortcut handler
     document.addEventListener('keydown', (e) => {
-      // Check if Ctrl (Windows) or Cmd (Mac) is pressed
-      if (!(e.ctrlKey || e.metaKey)) return;
+      // Check if either Ctrl (Windows/Linux) or Cmd (Mac) is pressed
+      const isCtrlOrCmdPressed = e.ctrlKey || e.metaKey;
       
+      // Check if Shift is also pressed
+      const isShiftPressed = e.shiftKey;
+
+      // If both conditions are not met, exit the function
+      if (!isCtrlOrCmdPressed || !isShiftPressed) {
+        return;
+      }
+
       // Ignore shortcuts when typing in input elements
       if (e.target.tagName === 'INPUT') return;
 
