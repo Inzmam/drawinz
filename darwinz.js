@@ -4,12 +4,6 @@
   function DrawingApp(config) {
     const { canvasId } = config;
 
-    // Add Font Awesome dynamically
-    const fontAwesome = document.createElement('link');
-    fontAwesome.rel = 'stylesheet';
-    fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
-    document.head.appendChild(fontAwesome);
-
     // Add CSS styles dynamically
     const styleSheet = document.createElement('style');
     styleSheet.textContent = `
@@ -26,25 +20,12 @@
         box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
         display: flex;
         flex-direction: column;
-        gap: 25px;
+        gap: 15px;
         height: 100vh;
         width: 120px;
         position: fixed;
         left: 0;
         top: 0;
-      }
-
-      .drawing-app-container .tool-group {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 12px;
-        padding: 15px 0;
-        border-bottom: 2px solid #f0f0f0;
-      }
-
-      .drawing-app-container .tool-group:last-child {
-        border-bottom: none;
       }
 
       .drawing-app-container .tool-btn {
@@ -181,23 +162,8 @@
           flex-direction: row;
           padding: 15px;
           justify-content: center;
-        }
-
-        .drawing-app-container .tool-group {
-          flex-direction: row;
-          padding: 0 15px;
-          border-bottom: none;
-          border-right: 2px solid #f0f0f0;
-        }
-
-        .drawing-app-container .tool-group:last-child {
-          border-right: none;
-        }
-
-        .drawing-app-container #brushSize {
-          transform: none;
-          width: 100px;
-          margin: 0;
+          flex-wrap: wrap;
+          gap: 10px;
         }
 
         .drawing-app-container canvas {
@@ -289,36 +255,25 @@
     brushSize.value = '5';
     brushGroup.appendChild(brushSize);
 
-    // Create tool buttons
+    // Create all buttons in a single group
     const tools = [
-      { name: 'Brush', icon: '✏️' },
-      { name: 'Eraser', icon: '🧹' },
-      { name: 'Line', icon: '╱' },
-      { name: 'Rectangle', icon: '□' },
-      { name: 'Circle', icon: '○' }
+      { name: 'Brush', icon: '✏️', shortcut: 'b', id: 'brush', title: 'Brush (Ctrl+Shift+B)' },
+      { name: 'Eraser', icon: '🧹', shortcut: 'e', id: 'eraser', title: 'Eraser (Ctrl+Shift+E)' },
+      { name: 'Line', icon: '╱', shortcut: 'l', id: 'line', title: 'Line (Ctrl+Shift+L)' },
+      { name: 'Rectangle', icon: '□', shortcut: 'r', id: 'rectangle', title: 'Rectangle (Ctrl+Shift+R)' },
+      { name: 'Circle', icon: '○', shortcut: 'c', id: 'circle', title: 'Circle (Ctrl+Shift+C)' },
+      { name: 'Undo', icon: '↩', onClick: undo, shortcut: 'z', id: 'undo', title: 'Undo (Ctrl+Shift+Z)' },
+      { name: 'Redo', icon: '↪', onClick: redo, shortcut: 'y', id: 'redo', title: 'Redo (Ctrl+Shift+Y)' },
+      { name: 'Clear', icon: '🗑', onClick: clearCanvas, shortcut: 'x', id: 'clear', title: 'Clear (Ctrl+Shift+X)' },
+      { name: 'Save', icon: '💾', onClick: downloadCanvas, shortcut: 's', id: 'save', title: 'Save (Ctrl+Shift+S)' }
     ];
-    tools.forEach(tool => {
-      const button = document.createElement('button');
-      button.textContent = tool.icon;
-      button.setAttribute('title', tool.name);
-      button.classList.add('tool-btn');
-      toolsGroup.appendChild(button);
-    });
 
-    // Create action buttons (Undo, Redo, Clear Canvas, Download)
-    const actions = [
-      { title: 'Undo', icon: '↩', onClick: undo },
-      { title: 'Redo', icon: '↪', onClick: redo },
-      { title: 'Clear', icon: '🗑', onClick: clearCanvas },
-      { title: 'Save', icon: '💾', onClick: downloadCanvas }
-    ];
-    actions.forEach(action => {
-      const button = document.createElement('button');
-      button.textContent = action.icon;
-      button.setAttribute('title', action.title);
-      button.classList.add('tool-btn');
-      button.addEventListener('click', action.onClick);
-      actionsGroup.appendChild(button);
+    tools.forEach(tool => {
+      const button = createToolButton(tool);
+      if (tool.onClick) {
+        button.addEventListener('click', tool.onClick);
+      }
+      toolbar.appendChild(button);
     });
 
     // Drawing state
@@ -353,7 +308,7 @@
         button.classList.add('active');
         
         // Set current tool based on title attribute
-        currentTool = button.getAttribute('title');
+        currentTool = button.id;
       });
     });
 
@@ -379,7 +334,7 @@
       const currentY = e.offsetY;
 
       // Restore the last saved state before drawing new preview
-      if (['Line', 'Rectangle', 'Circle'].includes(currentTool)) {
+      if (['line', 'rectangle', 'circle'].includes(currentTool)) {
         ctx.putImageData(lastDrawing, 0, 0);
       }
 
@@ -389,14 +344,14 @@
       ctx.strokeStyle = colorPicker.value;
       
       switch(currentTool) {
-        case 'Brush':
+        case 'brush':
           ctx.lineTo(currentX, currentY);
           ctx.stroke();
           ctx.beginPath();
           ctx.moveTo(currentX, currentY);
           break;
 
-        case 'Eraser':
+        case 'eraser':
           // Save current context state
           ctx.save();
           
@@ -418,14 +373,14 @@
           ctx.restore();
           break;
 
-        case 'Line':
+        case 'line':
           ctx.beginPath();
           ctx.moveTo(startX, startY);
           ctx.lineTo(currentX, currentY);
           ctx.stroke();
           break;
 
-        case 'Rectangle':
+        case 'rectangle':
           ctx.beginPath();
           ctx.rect(
             startX, 
@@ -436,7 +391,7 @@
           ctx.stroke();
           break;
 
-        case 'Circle':
+        case 'circle':
           ctx.beginPath();
           const radius = Math.sqrt(
             Math.pow(currentX - startX, 2) + 
@@ -503,6 +458,45 @@
       link.href = canvas.toDataURL();
       link.click();
     }
+
+    function createToolButton(tool) {
+      const button = document.createElement('button');
+      button.textContent = tool.icon;
+      button.setAttribute('title', tool.title);
+      button.classList.add('tool-btn');
+      button.id = tool.id;
+      button.dataset.shortcut = tool.shortcut;
+      return button;
+    }
+
+    // Add keyboard shortcut handler
+    document.addEventListener('keydown', (e) => {
+      // Check if either Ctrl (Windows/Linux) or Cmd (Mac) is pressed
+      const isCtrlOrCmdPressed = e.ctrlKey || e.metaKey;
+      
+      // Check if Shift is also pressed
+      const isShiftPressed = e.shiftKey;
+
+      // If both conditions are not met, exit the function
+      if (!isCtrlOrCmdPressed || !isShiftPressed) {
+        return;
+      }
+
+      // Ignore shortcuts when typing in input elements
+      if (e.target.tagName === 'INPUT') return;
+
+      const key = e.key.toLowerCase();
+
+      // Find the tool button with matching shortcut
+      const toolButton = Array.from(document.querySelectorAll('.tool-btn')).find(
+        btn => btn.dataset.shortcut === key
+      );
+
+      if (toolButton) {
+        e.preventDefault(); // Prevent default browser shortcuts
+        toolButton.click();
+      }
+    });
   }
 
   global.DrawingApp = DrawingApp;
